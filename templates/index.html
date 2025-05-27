@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>CoBean - コーヒー豆提案アプリ</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="left">
+            <div class="title">
+                <img src="{{ url_for('static', filename='icon.png') }}" alt="CoBean" class="title-icon">
+                <h1>CoBean</h1>
+            </div>
+            <form method="POST">
+                {% for label, var in [
+                    ('酸味', 'acidity'),
+                    ('苦味', 'bitterness'),
+                    ('コク', 'body'),
+                    ('風味', 'flavor'),
+                    ('後味', 'aftertaste')
+                ] %}
+                <div class="slider-group">
+                    <label for="{{ var }}">{{ label }}: <span id="{{ var }}-val">{{ slider_values[var] }}</span></label>
+                    <input type="range" min="0" max="10" step="0.1" name="{{ var }}" id="{{ var }}" value="{{ slider_values[var]}}">
+                    <div class="slider-labels"><span>0</span><span>10</span></div>
+                </div>
+                {% endfor %}
+                <button type="submit">送信</button>
+            </form>
+        </div>
+        <div class="right">
+            <div class="card single-card">
+                <div class="card-header">
+                    <img src="{{ url_for('static', filename='icon.png') }}" alt="豆アイコン" class="card-icon">
+                    <h2 class="card-title">
+                        {% if best_bean %}
+                            {{ best_bean['名前'] }}
+                        {% else %}
+                            あなたへおすすめの豆
+                        {% endif %}
+                    </h2>
+                </div>
+                <div class="card-chart">
+                    <canvas id="radarChart"></canvas>
+                </div>
+                <div class="card-body">
+                    <p>酸味：{{ best_bean['酸味'] if best_bean else '-' }}</p>
+                    <p>苦味：{{ best_bean['苦味'] if best_bean else '-' }}</p>
+                    <p>コク：{{ best_bean['コク'] if best_bean else '-' }}</p>
+                    <p>風味：{{ best_bean['風味'] if best_bean else '-' }}</p>
+                    <p>後味：{{ best_bean['後味'] if best_bean else '-' }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if results %}
+    <div class="table-container">
+        <details open>
+            <summary>おすすめの豆</summary>
+            <table>
+                <tr>
+                    {% for key in results[0].keys() %}
+                        <th>{{ key }}</th>
+                    {% endfor %}
+                </tr>
+                {% for row in results %}
+                <tr>
+                    {% for val in row.values() %}
+                        <td>{{ val }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </table>
+        </details>
+    </div>
+    {% endif %}
+
+    {% if chart_data %}
+    <script>
+        const chartData = {{ chart_data|safe }};
+        const userPrefs = [
+            {{ slider_values.acidity }},
+            {{ slider_values.bitterness }},
+            {{ slider_values.body }},
+            {{ slider_values.flavor }},
+            {{ slider_values.aftertaste }}
+        ];
+
+        const ctx = document.getElementById('radarChart').getContext('2d');
+        let step = 0;
+        const maxStep = 15;
+        let radarChart;
+
+        function createChart(data) {
+            radarChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: chartData.categories,
+                    datasets: [
+                        {
+                            label: 'あなたへのおすすめ',
+                            data: data,
+                            fill: true,
+                            backgroundColor: 'rgba(173, 216, 230, 0.5)',
+                            borderColor: 'rgba(135, 206, 235, 1)',
+                            borderWidth: 2
+                        },
+                        {
+                            label: 'あなたの設定',
+                            data: userPrefs,
+                            fill: false,
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 2,
+                            pointBackgroundColor: 'rgba(255, 99, 132, 1)',
+                            pointBorderColor: '#fff',
+                            pointRadius: 4,
+                            pointHoverRadius: 6
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            min: 0,
+                            max: 10,
+                            ticks: {
+                                stepSize: 2,
+                                backdropColor: 'transparent'
+                            },
+                            pointLabels: {
+                                backdropColor: 'transparent'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateChart(data) {
+            radarChart.data.datasets[0].data = data;
+            radarChart.update();
+        }
+
+        function animateRadar() {
+            step++;
+            const interpolated = chartData.values.map(v => v * (step / maxStep));
+
+            if (step === 1) createChart(interpolated);
+            else updateChart(interpolated);
+
+            if (step < maxStep) setTimeout(animateRadar, 50);
+        }
+
+        animateRadar();
+    </script>
+    {% endif %}
+
+    <script>
+        document.querySelectorAll("input[type=range]").forEach(slider => {
+            slider.addEventListener("input", event => {
+                const id = event.target.id;
+                const span = document.getElementById(`${id}-val`);
+                if (span) span.textContent = event.target.value;
+            });
+        });
+    </script>
+</body>
+</html>

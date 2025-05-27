@@ -1,0 +1,168 @@
+/* 全体スタイル */
+body {
+    font-family: sans-serif;
+    background-color: #FDF6F0;
+    color: #333;
+    padding: 1rem;
+    margin: 0;
+}
+.container {
+    max-width: 1100px;
+    margin: auto;
+    display: flex;
+    gap: 2rem;
+}
+.left, .right { flex: 1; }
+form { margin-bottom: 1rem; }
+.slider-group { margin-bottom: 1rem; }
+.slider-group label { display: flex; justify-content: space-between; font-size: 0.9rem; }
+.slider-labels { display: flex; justify-content: space-between; font-size: 0.7rem; }
+
+/* スライダートラック */
+input[type=range] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 8px;
+    background: #ddd;
+    border-radius: 4px;
+    outline: none;
+}
+input[type=range]::-webkit-slider-runnable-track {
+    height: 8px;
+    background: #ddd;
+    border-radius: 4px;
+}
+input[type=range]::-moz-range-track {
+    height: 8px;
+    background: #ddd;
+    border-radius: 4px;
+}
+
+/* スライダースライダー（つまみ） */
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    margin-top: -12px; /* トラック中央に合わせる */
+    width: 32px;
+    height: 32px;
+    background: url("/static/coffee_thumb.png") no-repeat center center;
+    background-size: contain;
+    cursor: pointer;
+    border: none;
+}
+input[type=range]::-moz-range-thumb {
+    width: 32px;
+    height: 32px;
+    background: url("/static/coffee_thumb.png") no-repeat center center;
+    background-size: contain;
+    cursor: pointer;
+    border: none;
+}
+
+/* ボタンなどその他 */
+button {
+    padding: 0.4rem 1rem;
+    font-size: 0.9rem;
+    background-color: #b85c38;
+    color: white;
+    border: none;
+    border-radius: 8px;
+}
+canvas {
+    max-width: 100%;
+    height: 300px !important;
+}
+.result h2 {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+}
+.table-container {
+    max-width: 1000px;
+    margin: 2rem auto;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 1rem;
+}
+th, td {
+    border: 1px solid #aaa;
+    padding: 0.5rem;
+    text-align: center;
+}
+/* レーダーチャートのサイズ・位置調整 */
+#radarChart {
+    display: block;
+    width: 400px !important;
+    height: 400px !important;
+    margin-left: auto;   /* コンテナ内で右寄せ */
+    margin-right: 0;
+}
+/* タイトルエリア */
+.title {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+.title-icon {
+    width: 32px;
+    height: 32px;
+    margin-right: 8px;
+}
+/* --- シングルカード用スタイル --- */
+.single-card {
+    /* カード背景を画像に */
+    background-image: url("/static/card.jpg");
+    background-size: cover;       /* カード全体を覆うように拡大縮小 */
+    background-position: center;  /* 画像の中央を表示 */
+    background-repeat: no-repeat; /* 繰り返しなし */
+  
+    /* 元のスタイルを残しつつ透明化 */
+    background-color: transparent;
+    border-radius: 12px;
+    padding: 1.5rem;
+    max-width: 500px;
+    margin: 2rem auto;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  
+    /* テキストを読みやすく */
+    color: white;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+  }  
+  
+  /* ヘッダー（タイトル＋アイコン） */
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .card-icon {
+    width: 40px;
+    height: 40px;
+  }
+  .card-title {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #333;
+  }
+  
+  /* レーダーチャートをカード幅にフィット */
+  .card-chart {
+    width: 100%;
+    height: 300px;
+  }
+  .card-chart canvas {
+    width: 100% !important;
+    height: 100% !important;
+  }
+  
+  /* 味の数値表示 */
+  .card-body p {
+    margin: 0.25rem 0;
+    font-size: 1rem;
+    color: #555;
+  }

@@ -166,3 +166,56 @@ th, td {
     font-size: 1rem;
     color: #555;
   }
+
+  /* 表の1行目（ヘッダー）の背景を茶色に */
+.table-container table tr:first-child {
+    background-color: #8B4513; /* 濃い茶色 */
+    color: white; /* 白字にすると見やすい */
+}
+
+/* 表の2行目以降の背景を白に */
+.table-container table tr:not(:first-child) {
+    background-color: white;
+}
+
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+        padding: 0 1rem;
+    }
+
+    .left, .right {
+        width: 100%;
+    }
+
+    .single-card {
+        margin: 1rem 0;
+        padding: 1rem;
+    }
+
+    .slider-group label {
+        font-size: 1rem;
+    }
+
+    .slider-labels {
+        font-size: 0.8rem;
+    }
+
+    table {
+        font-size: 0.8rem;
+    }
+
+    .card-title {
+        font-size: 1.2rem;
+    }
+
+    .card-icon {
+        width: 32px;
+        height: 32px;
+    }
+
+    #radarChart {
+        width: 100% !important;
+        height: auto !important;
+    }
+}

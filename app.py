@@ -46,7 +46,7 @@ def index():
             ]
         }
 
-        # 上位6件をカード表示用に抽出
+        # 全ての豆を抽出
         results = beans_scored.to_dict(orient="records")
 
     return render_template(

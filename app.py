@@ -31,6 +31,9 @@ def index():
             (beans["後味"]  - aftertaste)**2
         )**0.5
 
+        # 小数点第2位までに丸める
+        beans["スコア差"] = beans["スコア差"].round(2)
+
         # スコア順にソート
         beans_scored = beans.sort_values("スコア差")
         # ベストの豆取得

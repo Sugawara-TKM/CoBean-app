@@ -65,54 +65,44 @@
   </div>
 
   {% if results %}
-  <div class="table-container">
-    <details open>
-      <summary>おすすめの豆</summary>
+<div class="table-container">
+  <details open>
+    <summary>おすすめの豆</summary>
 
-      <table>
-        <thead>
+    <table>
+      <thead>
+        <tr>
+          {% for key in results[0].keys() %}
+            <th>{{ key }}</th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in results %}
+          {# 味覚カラムだけ取り出して最大/最小を求める #}
+          {% set taste_keys = ['酸味','苦味','コク','風味','後味'] %}
+          {% set taste_vals = [row['酸味'], row['苦味'], row['コク'], row['風味'], row['後味']] %}
+          {% set max_val = taste_vals|max %}
+          {% set min_val = taste_vals|min %}
+
           <tr>
             {% for key in results[0].keys() %}
-              <th>{{ key }}</th>
+              {% set val = row[key] %}
+              <td class="
+                {% if max_val != min_val and key in taste_keys and val == max_val %}taste-max{% elif max_val != min_val and key in taste_keys and val == min_val %}taste-min{% endif %}
+              ">{{ val }}</td>
             {% endfor %}
-            <th>検索</th> <!-- 追加: 操作列 -->
           </tr>
-        </thead>
-        <tbody>
-          {% for row in results %}
-            {# 味覚カラムだけ取り出して最大/最小を求める #}
-            {% set taste_keys = ['酸味','苦味','コク','風味','後味'] %}
-            {% set taste_vals = [row['酸味'], row['苦味'], row['コク'], row['風味'], row['後味']] %}
-            {% set max_val = taste_vals|max %}
-            {% set min_val = taste_vals|min %}
+        {% endfor %}
+      </tbody>
+    </table>
 
-            <!-- 行に豆の味覚を data-* で持たせる -->
-            <tr class="bean-row"
-                data-name="{{ row['名前'] }}"
-                data-acidity="{{ row['酸味'] }}"
-                data-bitterness="{{ row['苦味'] }}"
-                data-body="{{ row['コク'] }}"
-                data-flavor="{{ row['風味'] }}"
-                data-aftertaste="{{ row['後味'] }}">
-              {% for key in results[0].keys() %}
-                {% set val = row[key] %}
-                <td class="{% if max_val != min_val and key in taste_keys and val == max_val %}taste-max{% elif max_val != min_val and key in taste_keys and val == min_val %}taste-min{% endif %}">
-                  {{ val }}
-                </td>
-              {% endfor %}
-              <td>
-                <button type="button" class="btn-mini use-as-pref">この味で探す</button>
-              </td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+  </details>
+</div>
+{% endif %}
 
-    </details>
-  </div>
-  {% endif %}
 
-  <!-- 初期スライダー値（現状表示値） -->
+  <!-- 初期スライダー値を安全に埋め込む（現状表示値） -->
   <script id="slider-values" type="application/json">{{ slider_values | tojson }}</script>
   <script>
     const sliderValues = JSON.parse(document.getElementById('slider-values').textContent);
@@ -240,49 +230,12 @@
           radarChart.data.datasets[1].data = latest;
           radarChart.update();
         }
-      });
-    })();
 
-    // 追加：方針B「この味で探す」→ スライダー反映→即POST
-    (function setupUseAsPref() {
-      const form = document.querySelector('.left form');
-      if (!form) return;
-
-      document.querySelectorAll('.use-as-pref').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          const tr = e.target.closest('.bean-row');
-          if (!tr) return;
-
-          // スライダーとラベルを更新
-          const map = {
-            acidity: 'acidity',
-            bitterness: 'bitterness',
-            body: 'body',
-            flavor: 'flavor',
-            aftertaste: 'aftertaste'
-          };
-          Object.keys(map).forEach(k => {
-            const input = document.getElementById(map[k]);
-            const v = parseFloat(tr.dataset[k]);
-            if (input && !Number.isNaN(v)) {
-              input.value = v;
-              const span = document.getElementById(`${map[k]}-val`);
-              if (span) span.textContent = v;
-            }
-          });
-
-          // チャートの「あなたの設定」を即反映（存在すれば）
-          if (typeof radarChart !== 'undefined' && radarChart?.data?.datasets?.[1]) {
-            const latest = ['acidity','bitterness','body','flavor','aftertaste']
-              .map(k => parseFloat(tr.dataset[k]));
-            radarChart.data.datasets[1].data = latest;
-            radarChart.update();
-          }
-
-          // 送信して再計算（→ サーバで検索）
-          form.submit();
-        });
+        // おすすめ側のアニメをやり直したい場合
+        // if (typeof step !== 'undefined' && typeof animateRadar === 'function') {
+        //   step = 0;
+        //   animateRadar();
+        // }
       });
     })();
   </script>
